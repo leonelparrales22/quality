@@ -44,7 +44,7 @@ QUALITY_GROUP_ID = "CAN_DIG_LOGS_NOTIFICADOR"
 DATABASE_NAME = "ecbpprq51_repositorio_si"
 TABLE_NAME = "LogsNotificador_Pruebas"
 WAREHOUSE_DIR = Path("/home/leonelparrales/Spark/spark-warehouse")
-OUTPUT_CSV_PATH = Path("/home/leonelparrales/Spark/quality_results.csv")
+OUTPUT_CSV_PATH = Path("/home/leonelparrales/Documentos/Repositorios/quality/quality_results.csv")
 DATA_DOMAIN_NAME = "Canales_Digitales"
 
 SIMULATED_RULES: List[Dict[str, str]] = [
