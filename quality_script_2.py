@@ -43,7 +43,7 @@ DEEQU_JAR_PATH = "/home/leonelparrales/Spark/deequ-2.0.9-spark-3.1.jar"
 QUALITY_GROUP_ID = "CAN_DIG_LOGS_NOTIFICADOR"
 DATABASE_NAME = "ecbpprq51_repositorio_si"
 TABLE_NAME = "LogsNotificador_Pruebas"
-WAREHOUSE_DIR = Path("/home/leonelparrales/Spark/spark-warehouse")
+WAREHOUSE_DIR = Path("/home/leonelparrales/Documentos/Repositorios/quality/spark-warehouse")
 OUTPUT_CSV_PATH = Path("/home/leonelparrales/Documentos/Repositorios/quality/quality_results.csv")
 DATA_DOMAIN_NAME = "Canales_Digitales"
 
@@ -242,12 +242,25 @@ def prepare_example_table(spark: SparkSession, data: DataFrame) -> None:
 # -----------------------------------------------------------------------------
 # Quality engine (ported from the notebook)
 # -----------------------------------------------------------------------------
-def pyspark_transform(spark: SparkSession, input_data: Dict, param_dict: Dict) -> DataFrame:
-    """Quality engine that orchestrates Deequ checks based on parametrization."""
+def pyspark_transform(spark, input_data, param_dict):
+    import re
+    from typing import Dict, List, Tuple, Iterable, Optional, Union
+
+    from pyspark.sql import DataFrame
+    from pyspark.sql.functions import col, trim, lower, current_date, current_timestamp
+    from pyspark.sql.types import (
+        StructType,
+        StructField,
+        StringType,
+        DoubleType,
+        LongType,
+        DateType,
+        TimestampType,
+    )
+    from pyspark import StorageLevel
 
     os.environ["SPARK_VERSION"] = "3.2"
 
-    import pydeequ  # noqa: F401 - validates availability
     from pydeequ.checks import Check, CheckLevel
     from pydeequ.verification import VerificationResult, VerificationSuite
 
@@ -293,7 +306,7 @@ def pyspark_transform(spark: SparkSession, input_data: Dict, param_dict: Dict) -
         ),
     }
 
-    def metric_keys_for_rule(rule: Dict[str, str]) -> List[Tuple[str, str | None]]:
+    def metric_keys_for_rule(rule: Dict[str, str]) -> List[Tuple[str, Optional[str]]]:
         column = rule["column_name"]
         rule_type = rule["rule_type"]
         params = rule["params"]
@@ -359,28 +372,36 @@ def pyspark_transform(spark: SparkSession, input_data: Dict, param_dict: Dict) -
             trim(lower(col("estado").cast("string"))).alias("is_active_str"),
         )
 
+    def map_severity_to_checklevel(sev: str) -> CheckLevel:
+        sev_norm = (sev or "").strip().lower()
+        # Parametría: CRITICO / ADVERTENCIA
+        if sev_norm in {"critico", "crítico", "critical", "error"}:
+            return CheckLevel.Error
+        return CheckLevel.Warning
+
     def process_single_dataset(
         schema_name: str, table_name: str, dataset_rules: Iterable
-    ) -> DataFrame | None:
+    ) -> Optional[DataFrame]:
         full_table_name = f"{schema_name}.{table_name}"
+        df_data = None
         try:
             required_cols = {rule["column_name"] for rule in dataset_rules}
-            if required_cols:
-                query = f"SELECT {', '.join(required_cols)} FROM {full_table_name}"
-            else:
-                query = f"SELECT * FROM {full_table_name}"
+            query = (
+                f"SELECT {', '.join(required_cols)} FROM {full_table_name}"
+                if required_cols
+                else f"SELECT * FROM {full_table_name}"
+            )
 
             df_data = spark.sql(query)
 
             # Subir a memoria para evitar doble lectura
             df_data.persist(StorageLevel.MEMORY_AND_DISK)
-
             total_records = df_data.count()
 
             suite = VerificationSuite(spark).onData(df_data)
 
             dataset_rules_dicts = [rule.asDict() for rule in dataset_rules]
-            constraint_plans = []
+            constraint_plans: List[Dict[str, str]] = []
 
             for idx, rule in enumerate(dataset_rules_dicts):
                 rule_type = rule["rule_type"]
@@ -388,11 +409,7 @@ def pyspark_transform(spark: SparkSession, input_data: Dict, param_dict: Dict) -
                 if not constraint_fn:
                     continue
 
-                check_level = (
-                    CheckLevel.Error
-                    if str(rule["severity"]).lower() == "error"
-                    else CheckLevel.Warning
-                )
+                check_level = map_severity_to_checklevel(rule.get("severity"))
                 check_name = f"{rule_type}:{rule['column_name']}:{idx}"
                 check_obj = Check(spark, check_level, check_name)
 
@@ -403,12 +420,7 @@ def pyspark_transform(spark: SparkSession, input_data: Dict, param_dict: Dict) -
                     continue
 
                 suite.addCheck(check_obj)
-                constraint_plans.append(
-                    {
-                        "rule": rule,
-                        "check_name": check_name,
-                    }
-                )
+                constraint_plans.append({"rule": rule, "check_name": check_name})
 
             if not constraint_plans:
                 df_data.unpersist()
@@ -416,7 +428,7 @@ def pyspark_transform(spark: SparkSession, input_data: Dict, param_dict: Dict) -
 
             verification_result = suite.run()
 
-            metrics_map: Dict[tuple, float] = {}
+            metrics_map: Dict[Tuple[str, Optional[str]], float] = {}
             for metric in VerificationResult.successMetricsAsDataFrame(
                 spark, verification_result
             ).collect():
@@ -457,7 +469,9 @@ def pyspark_transform(spark: SparkSession, input_data: Dict, param_dict: Dict) -
                     if match:
                         metric_value = float(match.group(1))
 
-                porcentaje = float(metric_value * 100) if metric_value is not None else None
+                porcentaje = (
+                    float(metric_value * 100) if metric_value is not None else None
+                )
                 registros_fallidos = (
                     int(round(total_records * (1 - (porcentaje / 100.0))))
                     if porcentaje is not None
@@ -481,7 +495,7 @@ def pyspark_transform(spark: SparkSession, input_data: Dict, param_dict: Dict) -
                     (
                         None,
                         None,
-                        QUALITY_GROUP_ID,
+                        target_group_id,
                         full_table_name,
                         rule.get("data_domain"),
                         rule["column_name"],
@@ -515,16 +529,17 @@ def pyspark_transform(spark: SparkSession, input_data: Dict, param_dict: Dict) -
         except Exception as e:
             import traceback
 
-            if "df_data" in locals():
+            if df_data is not None:
                 df_data.unpersist()
-
             traceback.print_exc()
             print(f"Error procesando {schema_name}.{table_name}: {str(e)}")
             return None
 
+    target_group_id = param_dict.get("P_ID_GRUPO_CALIDAD", QUALITY_GROUP_ID)
+
     df_rules = get_standardized_rules(input_data)
     active_rules = df_rules.filter(
-        (col("group_id") == QUALITY_GROUP_ID)
+        (col("group_id") == target_group_id)
         & (col("is_active_str").isin("true", "1", "si"))
     ).collect()
 
