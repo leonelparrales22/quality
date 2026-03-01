@@ -1,0 +1,10 @@
+id_calidad_regla,dimension,descripcion,metodo
+COM_NULOS,completitud,Valida la cantidad de nulos,isComplete()
+COM_DUPLICADOS,completitud,Valida la unicidad de la columna,isUnique()
+COM_BLANCOS,completitud,Valida si el campo contiene espacios en blanco,hasPattern()
+VAL_PERMITIDOS,validez,Valida que el valor pertenezca al catálogo permitido,isContainedIn()
+VAL_POSITIVOS,validez,Verifica que los valores sean mayores o iguales a cero,isNonNegative()
+VAL_RANGO_VALORES,validez,Valida que el valor esté dentro del rango parametrizado,between()
+CONF_LONG_EXACTA,conformidad,Valida la longitud exacta parametrizada,lengthEquals()
+CONF_REGEX,conformidad,Valida el formato mediante expresión regular,hasPattern()
+COM_OBLIGATORIO,completitud,Valida que el dato no sea nulo ni contenga únicamente espacios en blanco,notNullOrEmpty()
