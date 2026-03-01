@@ -49,95 +49,49 @@ DATA_DOMAIN_NAME = "Canales_Digitales"
 
 SIMULATED_RULES: List[Dict[str, str]] = [
     {
-        "id_grupo_calidad": QUALITY_GROUP_ID,
+        "id_calidad_tabla": TABLE_NAME,
         "coleccion": DATABASE_NAME,
-        "tabla": TABLE_NAME,
-        "tipo_regla": "SIN_NULOS",
-        "nombre_columna": "documentId",
+        "nombre_columna": "remitenteNotificador",
+        "id_calidad_regla": "COM_NULOS",
         "parametros": "",
-        "gravedad": "CRITICO",
+        "filtros": "remitenteNotificador != 'OBSERVADOR'",
         "estado": True,
-        "descripcion_negocio": "Todo documento debe estar informado",
-        "umbral_minimo_sla": 99.0,
-        "dominio_datos": DATA_DOMAIN_NAME,
+        "descripcion": "Todo registro debe tener el remitente notificador. No nulos",
+        "umbral": 100.0,
+        "macrodominio": "CANDIG",
+        "dominio": DATA_DOMAIN_NAME,
+        "usuario_cambio": "laparral",
+        "fecha_cambio": "2026-02-27 17:20:00",
     },
     {
-        "id_grupo_calidad": QUALITY_GROUP_ID,
+        "id_calidad_tabla": TABLE_NAME,
         "coleccion": DATABASE_NAME,
-        "tabla": TABLE_NAME,
-        "tipo_regla": "DUPLICADOS",
         "nombre_columna": "guid_transaccion",
+        "id_calidad_regla": "COM_DUPLICADOS",
         "parametros": "",
-        "gravedad": "CRITICO",
+        "filtros": "remitenteNotificador != 'CARENCIA'",
         "estado": True,
-        "descripcion_negocio": "Cada transacción debe tener un GUID único",
-        "umbral_minimo_sla": 100.0,
-        "dominio_datos": DATA_DOMAIN_NAME,
+        "descripcion": "Cada transacción debe tener un GUID único",
+        "umbral": 90.0,
+        "macrodominio": "CANDIG",
+        "dominio": DATA_DOMAIN_NAME,
+        "usuario_cambio": "laparral",
+        "fecha_cambio": "2026-02-27 17:20:00",
     },
     {
-        "id_grupo_calidad": QUALITY_GROUP_ID,
+        "id_calidad_tabla": TABLE_NAME,
         "coleccion": DATABASE_NAME,
-        "tabla": TABLE_NAME,
-        "tipo_regla": "VALORES_PERMITIDOS",
         "nombre_columna": "estadoEnvioNotificacion",
+        "id_calidad_regla": "VAL_PERMITIDOS",
         "parametros": "success,failed",
-        "gravedad": "ADVERTENCIA",
-        "estado": True,
-        "descripcion_negocio": "Estados válidos del flujo de notificación",
-        "umbral_minimo_sla": 98.5,
-        "dominio_datos": DATA_DOMAIN_NAME,
-    },
-    {
-        "id_grupo_calidad": QUALITY_GROUP_ID,
-        "coleccion": DATABASE_NAME,
-        "tabla": TABLE_NAME,
-        "tipo_regla": "SOLO_POSITIVOS",
-        "nombre_columna": "montoTransaccion",
-        "parametros": "",
-        "gravedad": "ADVERTENCIA",
-        "estado": True,
-        "descripcion_negocio": "Los montos no pueden ser negativos",
-        "umbral_minimo_sla": 99.5,
-        "dominio_datos": DATA_DOMAIN_NAME,
-    },
-    {
-        "id_grupo_calidad": QUALITY_GROUP_ID,
-        "coleccion": DATABASE_NAME,
-        "tabla": TABLE_NAME,
-        "tipo_regla": "LONGITUD_EXACTA",
-        "nombre_columna": "cedula_identidad",
-        "parametros": "10",
-        "gravedad": "ADVERTENCIA",
-        "estado": True,
-        "descripcion_negocio": "La cédula debe tener 10 dígitos",
-        "umbral_minimo_sla": 99.0,
-        "dominio_datos": DATA_DOMAIN_NAME,
-    },
-    {
-        "id_grupo_calidad": QUALITY_GROUP_ID,
-        "coleccion": DATABASE_NAME,
-        "tabla": TABLE_NAME,
-        "tipo_regla": "FORMATO_REGEX",
-        "nombre_columna": "correoElectronico",
-        "parametros": r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
-        "gravedad": "ADVERTENCIA",
-        "estado": True,
-        "descripcion_negocio": "El correo debe cumplir con el formato estándar",
-        "umbral_minimo_sla": 97.0,
-        "dominio_datos": DATA_DOMAIN_NAME,
-    },
-    {
-        "id_grupo_calidad": QUALITY_GROUP_ID,
-        "coleccion": DATABASE_NAME,
-        "tabla": TABLE_NAME,
-        "tipo_regla": "RANGO_VALORES",
-        "nombre_columna": "edad_cliente",
-        "parametros": "18,100",
-        "gravedad": "ADVERTENCIA",
-        "estado": True,
-        "descripcion_negocio": "La edad del cliente debe estar entre 18 y 100 años",
-        "umbral_minimo_sla": 96.0,
-        "dominio_datos": DATA_DOMAIN_NAME,
+        "filtros": "",
+        "estado": False,
+        "descripcion": "Estados válidos del flujo de notificación",
+        "umbral": 90.0,
+        "macrodominio": "CANDIG",
+        "dominio": DATA_DOMAIN_NAME,
+        "usuario_cambio": "laparral",
+        "fecha_cambio": "2026-02-27 17:20:00",
     },
 ]
 
@@ -151,6 +105,7 @@ SAMPLE_LOGS: List[Dict[str, str]] = [
         "cedula_identidad": "0102030405",
         "correoElectronico": "cliente1@banco.com",
         "edad_cliente": 35,
+        "remitenteNotificador": "NOTIFICADOR_APP",
     },
     {
         "estadoEnvioNotificacion": "failed",
@@ -161,6 +116,7 @@ SAMPLE_LOGS: List[Dict[str, str]] = [
         "cedula_identidad": "123456789",  # longitud incorrecta
         "correoElectronico": "cliente2@banco",
         "edad_cliente": 17,
+        "remitenteNotificador": "OBSERVADOR",
     },
     {
         "estadoEnvioNotificacion": "pending",
@@ -171,6 +127,7 @@ SAMPLE_LOGS: List[Dict[str, str]] = [
         "cedula_identidad": "1098765432",
         "correoElectronico": "cliente3@banco.com",
         "edad_cliente": 45,
+        "remitenteNotificador": "NOTIFICADOR_APP",
     },
     {
         "estadoEnvioNotificacion": "success",
@@ -181,6 +138,7 @@ SAMPLE_LOGS: List[Dict[str, str]] = [
         "cedula_identidad": "1231231231",
         "correoElectronico": "cliente4@banco.com",
         "edad_cliente": 101,
+        "remitenteNotificador": "CARENCIA",
     },
     {
         "estadoEnvioNotificacion": "success",
@@ -191,6 +149,7 @@ SAMPLE_LOGS: List[Dict[str, str]] = [
         "cedula_identidad": "5556667778",
         "correoElectronico": "cliente5@banco.com",
         "edad_cliente": 60,
+        "remitenteNotificador": "NOTIFICADOR_APP",
     },
     {
         "estadoEnvioNotificacion": "unknown",
@@ -201,6 +160,7 @@ SAMPLE_LOGS: List[Dict[str, str]] = [
         "cedula_identidad": "9876543210",
         "correoElectronico": "cliente6@banco.com",
         "edad_cliente": 90,
+        "remitenteNotificador": "NOTIFICADOR_APP",
     },
 ]
 
@@ -243,10 +203,10 @@ def prepare_example_table(spark: SparkSession, data: DataFrame) -> None:
 # Quality engine (ported from the notebook)
 # -----------------------------------------------------------------------------
 def pyspark_transform(spark, input_data, param_dict):
-    import re
-    from typing import Dict, List, Tuple, Iterable, Optional, Union
+    from typing import Dict, Iterable, List, Tuple
 
     from pyspark.sql import DataFrame
+    from pyspark.sql import functions as F
     from pyspark.sql.functions import col, trim, lower, current_date, current_timestamp
     from pyspark.sql.types import (
         StructType,
@@ -259,91 +219,14 @@ def pyspark_transform(spark, input_data, param_dict):
     )
     from pyspark import StorageLevel
 
-    os.environ["SPARK_VERSION"] = "3.2"
-
-    from pydeequ.checks import Check, CheckLevel
-    from pydeequ.verification import VerificationResult, VerificationSuite
-
-    DIMENSION_BY_RULE = {
-        "SIN_NULOS": "Completitud",
-        "DUPLICADOS": "Unicidad",
-        "VALORES_PERMITIDOS": "Validez",
-        "SOLO_POSITIVOS": "Validez",
-        "LONGITUD_EXACTA": "Conformidad",
-        "FORMATO_REGEX": "Conformidad",
-        "RANGO_VALORES": "Validez",
-    }
-
-    RULE_REGISTRY = {
-        "SIN_NULOS": lambda check, column, params: check.isComplete(column),
-        "DUPLICADOS": lambda check, column, params: check.isUnique(column),
-        "VALORES_PERMITIDOS": lambda check, column, params: (
-            check.isContainedIn(
-                column,
-                [v.strip() for v in str(params).split(",") if v.strip()],
-            )
-            if params
-            else None
-        ),
-        "SOLO_POSITIVOS": lambda check, column, params: check.isNonNegative(column),
-        "LONGITUD_EXACTA": lambda check, column, params: (
-            check.satisfies(
-                f"length({column}) = {params}", f"length({column}) = {params}"
-            )
-            if params
-            else None
-        ),
-        "FORMATO_REGEX": lambda check, column, params: (
-            check.hasPattern(column, params) if params else None
-        ),
-        "RANGO_VALORES": lambda check, column, params: (
-            check.satisfies(
-                f"{column} >= {params.split(',')[0]} AND {column} <= {params.split(',')[1]}",
-                f"{column} >= {params.split(',')[0]} AND {column} <= {params.split(',')[1]}",
-            )
-            if params and "," in params
-            else None
-        ),
-    }
-
-    def metric_keys_for_rule(rule: Dict[str, str]) -> List[Tuple[str, Optional[str]]]:
-        column = rule["column_name"]
-        rule_type = rule["rule_type"]
-        params = rule["params"]
-
-        if rule_type == "SIN_NULOS":
-            return [("Completeness", column)]
-        if rule_type == "DUPLICADOS":
-            return [("Uniqueness", column)]
-        if rule_type in {"VALORES_PERMITIDOS", "SOLO_POSITIVOS", "FORMATO_REGEX"}:
-            return [("Compliance", column)]
-        if rule_type == "LONGITUD_EXACTA":
-            return [("Compliance", f"length({column}) = {params}")]
-        if rule_type == "RANGO_VALORES":
-            if params and "," in params:
-                lower_val, upper_val = params.split(",")
-                return [
-                    (
-                        "Compliance",
-                        f"{column} >= {lower_val} AND {column} <= {upper_val}",
-                    )
-                ]
-        return []
-
     output_schema = StructType(
         [
             StructField("periodo", DateType(), True),
             StructField("fecha_proceso", TimestampType(), True),
-            StructField("id_grupo_calidad", StringType(), True),
-            StructField("nombre_tabla", StringType(), True),
-            StructField("dominio_datos", StringType(), True),
-            StructField("nombre_columna", StringType(), True),
-            StructField("dimension_calidad", StringType(), True),
-            StructField("tipo_regla", StringType(), True),
+            StructField("id_calidad_tabla", StringType(), True),
+            StructField("columna", StringType(), True),
             StructField("parametros", StringType(), True),
-            StructField("gravedad", StringType(), True),
-            StructField("descripcion_negocio", StringType(), True),
-            StructField("umbral_minimo_sla", DoubleType(), True),
+            StructField("umbral", DoubleType(), True),
             StructField("estado_calidad", StringType(), True),
             StructField("total_registros", LongType(), True),
             StructField("registros_fallidos", LongType(), True),
@@ -359,209 +242,170 @@ def pyspark_transform(spark, input_data, param_dict):
             else raw_input
         )
         return source_df.select(
-            trim(col("id_grupo_calidad")).alias("group_id"),
+            trim(col("id_calidad_tabla")).alias("table_name"),
             trim(col("coleccion")).alias("schema"),
-            trim(col("tabla")).alias("table"),
-            trim(col("tipo_regla")).alias("rule_type"),
             trim(col("nombre_columna")).alias("column_name"),
+            trim(col("id_calidad_regla")).alias("rule_code"),
             trim(col("parametros")).alias("params"),
-            trim(col("gravedad")).alias("severity"),
-            trim(col("descripcion_negocio")).alias("business_description"),
-            col("umbral_minimo_sla").cast("double").alias("sla_threshold"),
-            trim(col("dominio_datos")).alias("data_domain"),
-            trim(lower(col("estado").cast("string"))).alias("is_active_str"),
+            trim(col("filtros")).alias("filters"),
+            col("estado").cast("boolean").alias("is_active"),
+            trim(col("descripcion")).alias("description"),
+            col("umbral").cast("double").alias("threshold"),
+            trim(col("macrodominio")).alias("macro_domain"),
+            trim(col("dominio")).alias("data_domain"),
+            trim(col("usuario_cambio")).alias("changed_by"),
+            trim(col("fecha_cambio")).alias("changed_at"),
         )
 
-    def map_severity_to_checklevel(sev: str) -> CheckLevel:
-        sev_norm = (sev or "").strip().lower()
-        # Parametría: CRITICO / ADVERTENCIA
-        if sev_norm in {"critico", "crítico", "critical", "error"}:
-            return CheckLevel.Error
-        return CheckLevel.Warning
-
-    def process_single_dataset(
-        schema_name: str, table_name: str, dataset_rules: Iterable
-    ) -> Optional[DataFrame]:
-        full_table_name = f"{schema_name}.{table_name}"
-        df_data = None
-        try:
-            required_cols = {rule["column_name"] for rule in dataset_rules}
-            query = (
-                f"SELECT {', '.join(required_cols)} FROM {full_table_name}"
-                if required_cols
-                else f"SELECT * FROM {full_table_name}"
+    def get_catalog(raw_input) -> DataFrame:
+        catalog_df = (
+            raw_input.get("sql_parametria_quality_catalogo")
+            if isinstance(raw_input, dict)
+            else None
+        )
+        if catalog_df is None:
+            empty_schema = StructType(
+                [
+                    StructField("id_calidad_regla", StringType(), True),
+                    StructField("dimension", StringType(), True),
+                    StructField("descripcion", StringType(), True),
+                    StructField("metodo", StringType(), True),
+                ]
             )
+            return spark.createDataFrame([], empty_schema)
 
-            df_data = spark.sql(query)
+        return catalog_df.select(
+            trim(col("id_calidad_regla")).alias("id_calidad_regla"),
+            trim(col("dimension")).alias("dimension"),
+            trim(col("descripcion")).alias("catalog_description"),
+            trim(col("metodo")).alias("metodo"),
+        )
 
-            # Subir a memoria para evitar doble lectura
-            df_data.persist(StorageLevel.MEMORY_AND_DISK)
-            total_records = df_data.count()
-
-            suite = VerificationSuite(spark).onData(df_data)
-
-            dataset_rules_dicts = [rule.asDict() for rule in dataset_rules]
-            constraint_plans: List[Dict[str, str]] = []
-
-            for idx, rule in enumerate(dataset_rules_dicts):
-                rule_type = rule["rule_type"]
-                constraint_fn = RULE_REGISTRY.get(rule_type)
-                if not constraint_fn:
-                    continue
-
-                check_level = map_severity_to_checklevel(rule.get("severity"))
-                check_name = f"{rule_type}:{rule['column_name']}:{idx}"
-                check_obj = Check(spark, check_level, check_name)
-
-                constraint_result = constraint_fn(
-                    check_obj, rule["column_name"], rule["params"]
-                )
-                if constraint_result is None:
-                    continue
-
-                suite.addCheck(check_obj)
-                constraint_plans.append({"rule": rule, "check_name": check_name})
-
-            if not constraint_plans:
-                df_data.unpersist()
-                return None
-
-            verification_result = suite.run()
-
-            metrics_map: Dict[Tuple[str, Optional[str]], float] = {}
-            for metric in VerificationResult.successMetricsAsDataFrame(
-                spark, verification_result
-            ).collect():
-                metrics_map[(metric["name"], metric["instance"])] = metric["value"]
-
-            check_map: Dict[str, Tuple[str, str]] = {}
-            for result in VerificationResult.checkResultsAsDataFrame(
-                spark, verification_result
-            ).collect():
-                check_map[result["check"]] = (
-                    result["constraint_status"],
-                    result["constraint_message"],
-                )
-
-            mapped_results: List[Tuple] = []
-            for plan in constraint_plans:
-                rule = plan["rule"]
-                check_name = plan["check_name"]
-                status, message = check_map.get(
-                    check_name, ("Unknown", "Regla no evaluada")
-                )
-
-                if status == "Success":
-                    estado_traducido = "CUMPLE"
-                elif status == "Failure":
-                    estado_traducido = "NO_CUMPLE"
-                else:
-                    estado_traducido = "DESCONOCIDO"
-
-                metric_value = None
-                for metric_key in metric_keys_for_rule(rule):
-                    if metric_key in metrics_map:
-                        metric_value = metrics_map[metric_key]
-                        break
-
-                if metric_value is None and isinstance(message, str):
-                    match = re.search(r"Value:\s*(0?\.\d+|1(?:\.0+)?)", message)
-                    if match:
-                        metric_value = float(match.group(1))
-
-                porcentaje = (
-                    float(metric_value * 100) if metric_value is not None else None
-                )
-                registros_fallidos = (
-                    int(round(total_records * (1 - (porcentaje / 100.0))))
-                    if porcentaje is not None
-                    else None
-                )
-
-                if status == "Failure":
-                    if porcentaje is not None:
-                        observacion = (
-                            f"Alerta: Solo el {porcentaje:.2f}% de los datos cumple la regla. "
-                            f"Se exigía el {rule.get('sla_threshold')}%."
-                        )
-                    else:
-                        observacion = "Fallo en la validación de la regla."
-                elif status == "Success":
-                    observacion = "Regla cumplida exitosamente."
-                else:
-                    observacion = message
-
-                mapped_results.append(
-                    (
-                        None,
-                        None,
-                        target_group_id,
-                        full_table_name,
-                        rule.get("data_domain"),
-                        rule["column_name"],
-                        DIMENSION_BY_RULE.get(rule["rule_type"], "Desconocida"),
-                        rule["rule_type"],
-                        rule["params"],
-                        rule["severity"],
-                        rule.get("business_description"),
-                        rule.get("sla_threshold"),
-                        estado_traducido,
-                        total_records,
-                        registros_fallidos,
-                        porcentaje,
-                        observacion,
-                    )
-                )
-
-            if not mapped_results:
-                df_data.unpersist()
-                return None
-
-            result_df = (
-                spark.createDataFrame(mapped_results, schema=output_schema)
-                .withColumn("periodo", current_date())
-                .withColumn("fecha_proceso", current_timestamp())
+    def evaluate_rule(rule_code: str, df: DataFrame, column: str, params: str) -> Tuple[int, str]:
+        if rule_code == "COM_NULOS":
+            passed = df.filter(col(column).isNotNull()).count()
+            return passed, ""
+        if rule_code == "COM_DUPLICADOS":
+            value_counts = df.groupBy(col(column)).count()
+            unique_rows = (
+                value_counts.filter(col("count") == 1)
+                .agg(F.sum("count"))
+                .collect()[0][0]
             )
+            passed = int(unique_rows) if unique_rows is not None else 0
+            return passed, ""
+        if rule_code == "VAL_PERMITIDOS":
+            allowed = [v.strip() for v in str(params).split(",") if v.strip()]
+            if not allowed:
+                return 0, "Parámetros vacíos para VAL_PERMITIDOS"
+            passed = df.filter(col(column).isin(allowed)).count()
+            return passed, ""
+        return None, f"Regla {rule_code} no soportada en la simulación"
 
-            df_data.unpersist()
-            return result_df
+    standardized_rules = get_standardized_rules(input_data)
+    catalog_df = get_catalog(input_data)
 
-        except Exception as e:
-            import traceback
+    if catalog_df.count() == 0:
+        rules_df = standardized_rules
+    else:
+        rules_df = standardized_rules.join(
+            catalog_df, standardized_rules["rule_code"] == catalog_df["id_calidad_regla"], "left"
+        )
 
-            if df_data is not None:
-                df_data.unpersist()
-            traceback.print_exc()
-            print(f"Error procesando {schema_name}.{table_name}: {str(e)}")
-            return None
+    target_table = param_dict.get("dataset", TABLE_NAME)
+    rules_df = rules_df.filter((col("is_active") == True) & (col("table_name") == target_table))
 
-    target_group_id = param_dict.get("P_ID_GRUPO_CALIDAD", QUALITY_GROUP_ID)
-
-    df_rules = get_standardized_rules(input_data)
-    active_rules = df_rules.filter(
-        (col("group_id") == target_group_id)
-        & (col("is_active_str").isin("true", "1", "si"))
-    ).collect()
-
+    active_rules = rules_df.collect()
     if not active_rules:
         return spark.createDataFrame([], schema=output_schema)
 
     datasets: Dict[Tuple[str, str], List] = {}
     for rule in active_rules:
-        datasets.setdefault((rule["schema"], rule["table"]), []).append(rule)
+        datasets.setdefault((rule["schema"], rule["table_name"]), []).append(rule)
 
-    final_frames: List[DataFrame] = []
+    result_rows: List[Tuple] = []
+
     for (schema_name, table_name), rules in datasets.items():
-        result_df = process_single_dataset(schema_name, table_name, rules)
-        if result_df is not None:
-            final_frames.append(result_df)
+        full_table_name = f"{schema_name}.{table_name}"
+        df_data = spark.table(full_table_name)
+        df_data.persist(StorageLevel.MEMORY_AND_DISK)
 
-    if not final_frames:
+        for rule in rules:
+            rule_dict = rule.asDict()
+            column = rule_dict["column_name"]
+            filters = rule_dict["filters"]
+            threshold = rule_dict["threshold"] or 0.0
+            params = rule_dict["params"] or ""
+            rule_code = rule_dict["rule_code"]
+            dimension = rule_dict.get("dimension")
+            metodo = rule_dict.get("metodo")
+
+            scoped_df = df_data if not filters else df_data.filter(filters)
+            scoped_df = scoped_df.select("*")
+            scoped_df.persist(StorageLevel.MEMORY_ONLY)
+
+            total_records = scoped_df.count()
+
+            if total_records == 0:
+                porcentaje = 100.0
+                registros_fallidos = 0
+                estado_calidad = "CUMPLE"
+                observacion = (
+                    "Sin registros después de aplicar filtros; regla considerada cumplida."
+                )
+            else:
+                passed_records, warning = evaluate_rule(
+                    rule_code, scoped_df, column, params
+                )
+
+                if passed_records is None:
+                    porcentaje = 0.0
+                    registros_fallidos = total_records
+                    estado_calidad = "NO_EVALUADA"
+                    observacion = warning
+                else:
+                    porcentaje = (passed_records / total_records) * 100
+                    registros_fallidos = total_records - passed_records
+                    estado_calidad = "CUMPLE" if porcentaje >= threshold else "NO_CUMPLE"
+                    observacion = (
+                        "Regla cumplida exitosamente."
+                        if estado_calidad == "CUMPLE"
+                        else (
+                            f"Alerta: Solo el {porcentaje:.2f}% de los datos cumple la regla. "
+                            f"Se exigía el {threshold}%."
+                        )
+                    )
+                    if warning:
+                        observacion = f"{observacion} {warning}".strip()
+
+            result_rows.append(
+                (
+                    None,
+                    None,
+                    table_name,
+                    column,
+                    params,
+                    threshold,
+                    estado_calidad,
+                    total_records,
+                    registros_fallidos,
+                    porcentaje,
+                    observacion,
+                )
+            )
+
+            scoped_df.unpersist()
+
+        df_data.unpersist()
+
+    if not result_rows:
         return spark.createDataFrame([], schema=output_schema)
 
-    from functools import reduce
-
-    return reduce(DataFrame.unionAll, final_frames)
+    return (
+        spark.createDataFrame(result_rows, schema=output_schema)
+        .withColumn("periodo", current_date())
+        .withColumn("fecha_proceso", current_timestamp())
+    )
 
 
 # -----------------------------------------------------------------------------
